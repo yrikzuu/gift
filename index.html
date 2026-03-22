@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Papa 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* =============================================
+     🎨 ZONA KUSTOMISASI — EDIT DI SINI AJA!
+     ============================================= */
+  :root {
+    /* --- WARNA UTAMA --- */
+    --warna-latar: #fff8f0;           /* warna background halaman */
+    --warna-kartu: #ffffff;           /* warna kartu ucapan */
+    --warna-aksen1: #e8875a;          /* warna utama (tombol, border, dll) */
+    --warna-aksen2: #f2c078;          /* warna aksen kedua */
+    --warna-teks-judul: #3d2b1f;      /* warna teks judul */
+    --warna-teks-ucapan: #5a3e32;     /* warna teks ucapan */
+    --warna-tombol-teks: #ffffff;     /* warna teks tombol */
+
+    /* --- WARNA BALON (isi warna sesukamu, bisa tambah lebih banyak) --- */
+    /* Balon diacak otomatis dari daftar di bawah via JavaScript */
+
+    /* --- TEKS --- */
+    --nama-penerima: "Papa";          /* nama yang muncul di header */
+  }
+
+  /* =============================================
+     AKHIR ZONA KUSTOMISASI
+     ============================================= */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--warna-latar);
+    font-family: 'Quicksand', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* LAYAR PEMBUKA */
+  #layar-pembuka {
+    position: fixed;
+    inset: 0;
+    background: var(--warna-latar);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  #layar-pembuka.sembunyi {
+    opacity: 0;
+    transform: scale(1.05);
+    pointer-events: none;
+  }
+
+  .teks-kecil-pembuka {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.9rem;
+    color: var(--warna-aksen1);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0;
+    animation: munculAtas 0.8s ease 0.3s forwards;
+  }
+
+  .judul-pembuka {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    color: var(--warna-teks-judul);
+    text-align: center;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: munculAtas 0.8s ease 0.5s forwards;
+  }
+
+  .judul-pembuka span {
+    color: var(--warna-aksen1);
+    font-style: italic;
+  }
+
+  .subjudul-pembuka {
+    font-size: 1rem;
+    color: #999;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: munculAtas 0.8s ease 0.7s forwards;
+  }
+
+  .tombol-buka {
+    background: var(--warna-aksen1);
+    color: var(--warna-tombol-teks);
+    border: none;
+    padding: 18px 52px;
+    border-radius: 60px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    animation: munculAtas 0.8s ease 0.9s forwards;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 30px rgba(232, 135, 90, 0.35);
+  }
+
+  .tombol-buka::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    transform: translateX(-100%) skewX(-15deg);
+    transition: transform 0.4s ease;
+  }
+
+  .tombol-buka:hover::before { transform: translateX(100%) skewX(-15deg); }
+  .tombol-buka:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(232, 135, 90, 0.5); }
+  .tombol-buka:active { transform: translateY(0); }
+
+  .ikon-kue {
+    font-size: 3rem;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: munculAtas 0.8s ease 0.1s forwards, goyang 2s ease-in-out 2s infinite;
+    display: block;
+  }
+
+  /* KONTEN UTAMA */
+  #konten-utama {
+    display: none;
+    padding: 60px 20px 120px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  #konten-utama.tampil {
+    display: block;
+    animation: munculAtas 1s ease forwards;
+  }
+
+  /* KARTU FOTO */
+  .kartu-foto {
+    background: var(--warna-kartu);
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(61, 43, 31, 0.1);
+    overflow: hidden;
+    margin-bottom: 24px;
+    border: 1px solid rgba(232, 135, 90, 0.15);
+  }
+
+  .wadah-foto {
+    width: 100%;
+    height: 380px;
+    background: linear-gradient(135deg, #fde8d8 0%, #fdf0e0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* =============================================
+     🖼️ GANTI FOTO: ubah nilai src di bawah ini
+     (URL foto online atau nama file .jpg/.png
+      yang ada di folder yang sama dengan index.html)
+     ============================================= */
+  .wadah-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none; /* akan tampil otomatis jika src diisi */
+  }
+
+  .placeholder-foto {
+    text-align: center;
+    color: #c4a090;
+  }
+
+  .placeholder-foto .ikon-foto { font-size: 4rem; display: block; margin-bottom: 12px; }
+  .placeholder-foto p { font-size: 0.9rem; line-height: 1.6; }
+  .placeholder-foto code {
+    background: #fde8d8;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--warna-aksen1);
+  }
+
+  /* HIASAN HEADER KARTU */
+  .header-kartu {
+    padding: 20px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hiasan-bunga {
+    font-size: 1.4rem;
+    animation: putar 8s linear infinite;
+    display: inline-block;
+  }
+
+  .label-tanggal {
+    font-size: 0.8rem;
+    color: #bbb;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* KARTU UCAPAN */
+  .kartu-ucapan {
+    background: var(--warna-kartu);
+    border-radius: 24px;
+    padding: 36px 40px;
+    box-shadow: 0 20px 60px rgba(61, 43, 31, 0.08);
+    border: 1px solid rgba(232, 135, 90, 0.12);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kartu-ucapan::before {
+    content: '"';
+    font-family: 'Playfair Display', serif;
+    font-size: 12rem;
+    color: var(--warna-aksen2);
+    opacity: 0.12;
+    position: absolute;
+    top: -40px;
+    left: 10px;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .nama-judul {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--warna-aksen1);
+    margin-bottom: 4px;
+  }
+
+  .nama-judul span { font-style: italic; }
+
+  .garis-hiasan {
+    height: 3px;
+    width: 60px;
+    background: linear-gradient(to right, var(--warna-aksen1), var(--warna-aksen2));
+    border-radius: 2px;
+    margin-bottom: 24px;
+  }
+
+  /* =============================================
+     ✍️ GANTI UCAPAN: ubah teks di dalam
+     elemen <p class="teks-ucapan"> di bagian HTML bawah
+     ============================================= */
+  .teks-ucapan {
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: var(--warna-teks-ucapan);
+    position: relative;
+    z-index: 1;
+  }
+
+  .teks-ucapan .highlight {
+    color: var(--warna-aksen1);
+    font-weight: 600;
+  }
+
+  .ttd {
+    margin-top: 28px;
+    text-align: right;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: #bbb;
+    font-size: 1rem;
+  }
+
+  /* =============================================
+     ✍️ GANTI TTD: ubah teks .ttd di HTML bawah
+     ============================================= */
+
+  /* HIASAN BINTANG */
+  .hiasan-bawah {
+    text-align: center;
+    padding: 16px 0 0;
+    font-size: 1.3rem;
+    letter-spacing: 8px;
+    opacity: 0.5;
+  }
+
+  /* BALON */
+  .balon {
+    position: fixed;
+    bottom: -200px;
+    pointer-events: none;
+    z-index: 10;
+    animation: terbangAtas linear forwards;
+  }
+
+  .balon svg { filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); }
+
+  /* CONFETTI */
+  .confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    z-index: 200;
+    animation: jatuhanConfetti linear forwards;
+  }
+
+  /* ANIMASI */
+  @keyframes munculAtas {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes goyang {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+  }
+
+  @keyframes putar {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes terbangAtas {
+    0% { bottom: -200px; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { bottom: 110vh; opacity: 0; }
+  }
+
+  @keyframes ayunBalon {
+    0%, 100% { transform: rotate(-8deg); }
+    50% { transform: rotate(8deg); }
+  }
+
+  @keyframes jatuhanConfetti {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-80vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* RESPONSIF */
+  @media (max-width: 480px) {
+    .kartu-ucapan { padding: 28px 24px; }
+    .judul-pembuka { font-size: 2.5rem; }
+    .wadah-foto { height: 260px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== LAYAR PEMBUKA ===== -->
+<div id="layar-pembuka">
+  <span class="ikon-kue">🎂</span>
+  <p class="teks-kecil-pembuka">a birthday surprise</p>
+  <h1 class="judul-pembuka">Happy Birthday,<br><span>Papa</span> 🎉</h1>
+  <!-- Ubah teks di atas kalau mau nama yang beda -->
+  <p class="subjudul-pembuka">coba buka ✨</p>
+  <button class="tombol-buka" onclick="bukaSurprise()">
+    🎁 Open Gift
+  </button>
+</div>
+
+<!-- ===== KONTEN UTAMA ===== -->
+<div id="konten-utama">
+
+  <!-- KARTU FOTO -->
+  <div class="kartu-foto">
+    <div class="header-kartu">
+      <!-- =============================================
+           🌸 GANTI HIASAN: ganti emoji di bawah ini
+           ============================================= -->
+      <span class="hiasan-bunga">🌸</span>
+      <span class="label-tanggal">With Love ❤️</span>
+      <span class="hiasan-bunga" style="animation-direction: reverse;">🌸</span>
+    </div>
+
+    <div class="wadah-foto" id="wadah-foto">
+      <!-- =============================================
+           🖼️ CARA GANTI FOTO:
+           1. Taruh file foto (misal: foto.jpg) di folder
+              yang sama dengan index.html
+           2. Hapus tanda  di bawah ini dan ubah jadi:
+              <img id="foto" src="foto.jpg" alt="Papa">
+           3. Upload keduanya ke GitHub
+           Atau bisa juga pakai link foto online langsung.
+           ============================================= -->
+     <img id="foto" src="https://i.ibb.co.com/8gL50xQd/bapa.jpg" alt="Papa">
+
+      <div class="placeholder-foto" id="placeholder-foto">
+        <span class="ikon-foto">📷</span>
+        <p>
+          Foto belum dimasukkan.<br>
+          Edit file HTML ini, cari tulisan<br>
+          <code>&lt;!-- CARA GANTI FOTO --&gt;</code><br>
+          lalu ikuti petunjuknya!
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- KARTU UCAPAN -->
+  <div class="kartu-ucapan">
+    <p class="nama-judul">Happy Birthday, <span>Papa</span> 🎂</p>
+    <div class="garis-hiasan"></div>
+
+    <!-- =============================================
+         ✍️ GANTI UCAPAN: edit teks di bawah ini
+         ============================================= -->
+    <p class="teks-ucapan">
+      Happy birthday papaa, semoga panjang umur, sehat selalu,
+      dilancarkan rezekinya, dan dimudahkan aktivitasnya.<br><br>
+
+      Maapin yak kalo banyak salahnya dan belom maksimal awokwok...<br><br>
+
+      <span class="highlight">I've learned a lot from you.</span>
+      Thank you for being the best dad.
+      Thank you for everything...<br><br>
+
+      Though I can't express my love with a words, you're my world and you're priceless. 👑<br><br>
+
+      <span class="highlight">Have a good day!!</span> 🎉
+    </p>
+
+    <!-- =============================================
+         ✍️ GANTI TTD: ubah nama di bawah
+         ============================================= -->
+    <p class="ttd">— ur daughter 💕</p>
+
+    <div class="hiasan-bawah">🍁 ✨ 🍁 ✨ 🍁</div>
+  </div>
+
+</div>
+
+<script>
+  // =============================================
+  // 🎈 WARNA BALON — tambah atau ganti warna sesukamu!
+  // =============================================
+  const warnaBalon = [
+    { isi: '#FF6B6B', tali: '#cc4444' },  // merah
+    { isi: '#FFD93D', tali: '#cc9900' },  // kuning
+    { isi: '#6BCB77', tali: '#3a9945' },  // hijau
+    { isi: '#4D96FF', tali: '#2255cc' },  // biru
+    { isi: '#F4A261', tali: '#c0622a' },  // oranye
+    { isi: '#C77DFF', tali: '#8800cc' },  // ungu
+    { isi: '#FF85A1', tali: '#cc3366' },  // pink
+    { isi: '#06D6A0', tali: '#029a72' },  // tosca
+  ];
+
+  // =============================================
+  // 🎊 WARNA CONFETTI — ganti sesukamu
+  // =============================================
+  const warnaConfetti = [
+    '#e8875a', '#f2c078', '#FFD93D', '#FF6B6B',
+    '#C77DFF', '#4D96FF', '#06D6A0', '#FF85A1'
+  ];
+
+  // ---- Jangan ubah kode di bawah kecuali kamu ngerti JS ----
+
+  let intervalBalon;
+  let sudahDibuka = false;
+
+  function bukaSurprise() {
+    if (sudahDibuka) return;
+    sudahDibuka = true;
+
+    const pembuka = document.getElementById('layar-pembuka');
+    const konten = document.getElementById('konten-utama');
+
+    // Cek dan tampilkan foto jika src diisi
+    const foto = document.getElementById('foto');
+    const placeholder = document.getElementById('placeholder-foto');
+    if (foto && foto.src && !foto.src.endsWith('undefined') && !foto.src.includes('NAMA_FILE')) {
+      foto.style.display = 'block';
+      if (placeholder) placeholder.style.display = 'none';
+    }
+
+    // Sembunyi layar pembuka
+    pembuka.classList.add('sembunyi');
+    setTimeout(() => { pembuka.style.display = 'none'; }, 900);
+
+    // Tampilkan konten
+    konten.classList.add('tampil');
+
+    // Mulai confetti dari kiri bawah dan kanan bawah
+    tembakConfetti('kiri');
+    tembakConfetti('kanan');
+    setTimeout(() => { tembakConfetti('kiri'); tembakConfetti('kanan'); }, 400);
+    setTimeout(() => { tembakConfetti('kiri'); tembakConfetti('kanan'); }, 800);
+
+    // Mulai balon
+    setTimeout(mulaiBalon, 500);
+  }
+
+  function buatConfetti(x, y, sudut) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    const warna = warnaConfetti[Math.floor(Math.random() * warnaConfetti.length)];
+    const bentuk = Math.random() > 0.5 ? '50%' : '0%';
+    const ukuran = 6 + Math.random() * 8;
+    const kecepatan = 0.8 + Math.random() * 0.8;
+
+    el.style.cssText = `
+      left: ${x}px;
+      bottom: ${y}px;
+      width: ${ukuran}px;
+      height: ${ukuran}px;
+      background: ${warna};
+      border-radius: ${bentuk};
+      transform-origin: center;
+      animation-duration: ${kecepatan}s;
+      animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
+    `;
+
+    // Tambah sedikit hamburan horizontal
+    el.style.animationName = 'jatuhanConfetti';
+    const geser = (Math.random() - 0.5) * 80;
+    el.style.setProperty('--geser', geser + 'px');
+    el.style.transform = `translateX(${geser}px)`;
+
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1200);
+  }
+
+  function tembakConfetti(sisi) {
+    const banyak = 18;
+    const x = sisi === 'kiri' ? 60 : window.innerWidth - 60;
+    for (let i = 0; i < banyak; i++) {
+      setTimeout(() => {
+        buatConfetti(
+          x + (Math.random() - 0.5) * 40,
+          30 + Math.random() * 20,
+          sisi === 'kiri' ? 45 : 135
+        );
+      }, i * 40);
+    }
+  }
+
+  function buatBalonSVG(warna, posisiX) {
+    const w = warna;
+    // SVG balon dengan tangkai dan tali
+    return `<svg width="60" height="120" viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg">
+      <!-- Balon -->
+      <ellipse cx="30" cy="35" rx="26" ry="30" fill="${w.isi}"/>
+      <!-- Highlight -->
+      <ellipse cx="22" cy="22" rx="7" ry="9" fill="rgba(255,255,255,0.3)" transform="rotate(-20 22 22)"/>
+      <!-- Tangkai bawah -->
+      <path d="M30 65 L30 70" stroke="${w.tali}" stroke-width="2" stroke-linecap="round"/>
+      <!-- Simpul -->
+      <circle cx="30" cy="68" r="3" fill="${w.tali}"/>
+      <!-- Tali melengkung -->
+      <path d="M30 71 C25 80 35 90 30 105" stroke="${w.tali}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  function mulaiBalon() {
+    const zonaKiri = [5, 25];   // persen dari lebar layar
+    const zonaTengah = [35, 65];
+    const zonaKanan = [75, 95];
+    const semuaZona = [zonaKiri, zonaTengah, zonaKanan];
+    let zonaGiliran = 0;
+
+    function lepaskanBalon() {
+      const zona = semuaZona[zonaGiliran % semuaZona.length];
+      zonaGiliran++;
+
+      const pct = zona[0] + Math.random() * (zona[1] - zona[0]);
+      const x = (pct / 100) * window.innerWidth;
+      const warna = warnaBalon[Math.floor(Math.random() * warnaBalon.length)];
+      const durasi = 7 + Math.random() * 6;
+      const ukuranSkala = 0.7 + Math.random() * 0.7;
+
+      const el = document.createElement('div');
+      el.className = 'balon';
+      el.innerHTML = buatBalonSVG(warna, x);
+      el.style.cssText = `
+        left: ${x - 30}px;
+        transform: scale(${ukuranSkala});
+        transform-origin: bottom center;
+        animation-duration: ${durasi}s;
+        animation-delay: 0s;
+      `;
+
+      // Animasi ayun
+      el.querySelector('svg').style.cssText = `
+        animation: ayunBalon ${2 + Math.random()}s ease-in-out infinite;
+        animation-delay: ${Math.random()}s;
+      `;
+
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), durasi * 1000 + 500);
+    }
+
+    lepaskanBalon();
+    intervalBalon = setInterval(lepaskanBalon, 1200);
+
+    // Hentikan setelah 30 detik biar tidak terlalu ramai terus
+    setTimeout(() => {
+      clearInterval(intervalBalon);
+      intervalBalon = setInterval(lepaskanBalon, 3000); // lanjut pelan-pelan
+    }, 30000);
+  }
+</script>
+
+</body>
+</html>
